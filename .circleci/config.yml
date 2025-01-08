@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.0.1
-  docker:  circleci/docker@2.0
 
 jobs:
   build:
@@ -32,6 +31,17 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run:
+          name:  Authenticate with Docker Hub
+          command:
+            echo  $DOCKER_PASSWORD  |  docker login -u $DOCKER_USERNAME  --password-stdin
+      - run:
+          name: Build Docker Image
+          command: docker build -t bindugopinathan/education-space:latest .
+      - run:
+          name: Push Docker Image
+          command: docker push bindugopinathan/education-space:latest    
+
       - docker/login:
           username:  $DOCKER_USERNAME
           password:  $DOCKER_PASSWORD
