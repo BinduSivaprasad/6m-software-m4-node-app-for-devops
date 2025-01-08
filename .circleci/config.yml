@@ -27,7 +27,7 @@ jobs:
 
   build-and-push:
     docker:
-      - image:  circleci/docker:20.10.7
+      - image: cimg/node:16.10
     steps:
       - checkout
       - setup_remote_docker
@@ -40,7 +40,7 @@ jobs:
           command: docker build -t bindugopinathan/education-space:latest .
       - run:
           name: Push Docker Image
-          command: docker push bindugopinathan/education-space:latest    
+          command: docker push bindugopinathan/education-space:latest        
 
 workflows:
   simple_workflow:
@@ -51,4 +51,4 @@ workflows:
             - build
       - build-and-push:
           requires:
-            - test      
+            - test        
