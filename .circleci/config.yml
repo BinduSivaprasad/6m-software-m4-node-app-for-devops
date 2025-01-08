@@ -33,12 +33,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - docker/login:
-        username:  $DOCKER_USERNAME
-        password:  $DOCKER_PASSWORD
+          username:  $DOCKER_USERNAME
+          password:  $DOCKER_PASSWORD
       - docker/build:
-        image:  bindugopinathan/education-space:latest 
+          image:  bindugopinathan/education-space:latest 
       - docker/push:
-        image:  bindugopinathan/education-space:latest  
+          image:  bindugopinathan/education-space:latest  
 
 workflows:
   simple_workflow:
