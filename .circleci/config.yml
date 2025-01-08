@@ -42,14 +42,6 @@ jobs:
           name: Push Docker Image
           command: docker push bindugopinathan/education-space:latest    
 
-      - docker/login:
-          username:  $DOCKER_USERNAME
-          password:  $DOCKER_PASSWORD
-      - docker/build:
-          image:  bindugopinathan/education-space:latest 
-      - docker/push:
-          image:  bindugopinathan/education-space:latest  
-
 workflows:
   simple_workflow:
     jobs:
