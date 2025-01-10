@@ -26,6 +26,16 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
+  publish:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: bindugopinathan/education-space:latest
+      - docker/push
+          image: bindugopinathan/education-space:latest       
   deploy:
     docker:
       - image: cimg/node:16.10
@@ -50,6 +60,9 @@ workflows:
       - test:
           requires: 
             - build
+      - publish:
+          requires:
+            - test
       - deploy:
           requires:
-            - test  
+            - publish  
