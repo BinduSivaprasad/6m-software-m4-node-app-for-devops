@@ -2,8 +2,6 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.0.1
-  heroku: circleci/heroku@2.0.0
-  docker: circleci/docker@2.1.4
 
 jobs:
   build:
@@ -26,22 +24,23 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
-  deploy:
+
+  build-and-push:
     docker:
       - image: cimg/node:16.10
     steps:
-      - setup_remote_docker
-      - heroku/install
       - checkout
+      - setup_remote_docker
       - run:
-          name: Heroku Container Push
-          command: |
-            heroku container:login
-            heroku stack:set container -a bindu-su-devops
-            heroku container:push web -a bindu-su-devops
-            heroku container:release web -a bindu-su-devops
-
-
+          name:  Authenticate with Docker Hub
+          command:
+            echo  $DOCKER_PASSWORD  |  docker login -u $DOCKER_USERNAME  --password-stdin
+      - run:
+          name: Build Docker Image
+          command: docker build -t bindugopinathan/education-space:latest .
+      - run:
+          name: Push Docker Image
+          command: docker push bindugopinathan/education-space:latest        
 
 workflows:
   simple_workflow:
@@ -50,6 +49,6 @@ workflows:
       - test:
           requires: 
             - build
-      - deploy:
+      - build-and-push:
           requires:
-            - test
+            - test        
