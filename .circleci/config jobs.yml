@@ -61,28 +61,13 @@ jobs:
 workflows:
   simple_workflow:
     jobs:
-      - build:
-          filters:
-            only:
-              - main
-              - release
+      - build
       - test:
           requires: 
             - build
-          filters:
-            branches:
-              only:
-                - main
-                - release   
       - publish:
           requires:
             - test
-          filters:
-            branches:
-              only: release  
       - deploy:
           requires:
             - publish  
-          filters:
-            branches:
-              only: release  
