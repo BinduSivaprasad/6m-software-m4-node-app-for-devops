@@ -34,7 +34,7 @@ jobs:
       - docker/check
       - docker/build:
           image: bindugopinathan/education-space:latest
-      - docker/push
+      - docker/push:
           image: bindugopinathan/education-space:latest       
   deploy:
     docker:
