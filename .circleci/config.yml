@@ -64,9 +64,9 @@ workflows:
       - build:
           filters:
             branches:
-            only:
-              - main
-              - release
+              only:
+                - main
+                - release
       - test:
           requires: 
             - build
