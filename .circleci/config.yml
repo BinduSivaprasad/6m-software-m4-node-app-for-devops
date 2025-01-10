@@ -31,11 +31,16 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - docker/check
-      - docker/build:
-          image: bindugopinathan/education-space:latest
-      - docker/push:
-          image: bindugopinathan/education-space:latest       
+      - run: 
+          name:  Authenticate with Docker Hub
+          command:
+            echo  $DOCKER_PASSWORD  |  docker login -u $DOCKER_USERNAME  --password-stdin
+      - run:
+          name: Build Docker Image
+          command: docker build -t bindugopinathan/education-space:latest .
+      - run:
+          name: Push Docker Image
+          command: docker push bindugopinathan/education-space:latest          
   deploy:
     docker:
       - image: cimg/node:16.10
