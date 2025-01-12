@@ -49,9 +49,8 @@ jobs:
       - heroku/install
       - checkout
       - run:
-          name: Deploy Application
+          name: Heroku Container Push
           command: |
-            echo "Deploying application to production"
             heroku container:login
             heroku stack:set container -a bindu-su-devops
             heroku container:push web -a bindu-su-devops
@@ -62,29 +61,13 @@ jobs:
 workflows:
   simple_workflow:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - main
-                - release
+      - build
       - test:
           requires: 
             - build
-          filters:
-            branches:
-              only:
-                - main
-                - release  
       - publish:
           requires:
             - test
-          filters:
-            branches:
-              only: release  
       - deploy:
           requires:
             - publish  
-          filters:
-            branches:
-              only: release  
