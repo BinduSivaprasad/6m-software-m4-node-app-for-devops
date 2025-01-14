@@ -78,6 +78,9 @@ workflows:
       - scan:
           requires:
             - build
+      - codescan:
+          requires:
+            - build      
       - test:
           requires: 
             - scan
