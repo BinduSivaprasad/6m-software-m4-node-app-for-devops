@@ -1,0 +1,89 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.0.1
+  heroku: circleci/heroku@2.0.0
+  docker: circleci/docker@2.1.4
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run: |
+          echo "Install dependencies"
+          npm install
+  test:
+    docker: 
+      - image: cimg/node:16.10
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run: |
+          echo "Running tests"
+          npm run test
+  publish:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run: 
+          name:  Authenticate with Docker Hub
+          command:
+            echo  $DOCKER_PASSWORD  |  docker login -u $DOCKER_USERNAME  --password-stdin
+      - run:
+          name: Build Docker Image
+          command: docker build -t bindugopinathan/education-space:latest .
+      - run:
+          name: Push Docker Image
+          command: docker push bindugopinathan/education-space:latest          
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:login
+            heroku stack:set container -a bindu-su-devops
+            heroku container:push web -a bindu-su-devops
+            heroku container:release web -a bindu-su-devops
+
+
+
+workflows:
+  simple_workflow:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - main
+                - release
+      - test:
+          requires: 
+            - build
+          filters:
+            branches:
+              only:
+                - main
+                - release   
+      - publish:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release  
+      - deploy:
+          requires:
+            - publish  
+          filters:
+            branches:
+              only: release  
