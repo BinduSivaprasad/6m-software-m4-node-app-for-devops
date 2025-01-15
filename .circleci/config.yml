@@ -45,7 +45,7 @@ jobs:
     docker: 
       - image: cimg/node:16.10
     environment:
-      IMAGE_NAME: bindugopinathan/my-assignment-app:latest
+      IMAGE_NAME: bindugopinathan/education-space
     steps:
       - checkout
       - setup_remote_docker
@@ -57,7 +57,7 @@ jobs:
     docker: 
       - image: cimg/node:16.10
     environment:
-      IMAGE_NAME: bindugopinathan/my-assignment-app:latest
+      IMAGE_NAME: bindugopinathan/education-space
     steps:
       - checkout
       - setup_remote_docker
