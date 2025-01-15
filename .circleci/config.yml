@@ -4,6 +4,7 @@ orbs:
   node: circleci/node@5.0.1
   heroku: circleci/heroku@2.0.0
   docker: circleci/docker@2.1.4
+  snyk: snyk/snyk@1.5.0
 
 jobs:
   build:
@@ -26,21 +27,6 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
-  publish:
-    executor: docker/docker
-    steps:
-      - setup_remote_docker
-      - checkout
-      - run: 
-          name:  Authenticate with Docker Hub
-          command:
-            echo  $DOCKER_PASSWORD  |  docker login -u $DOCKER_USERNAME  --password-stdin
-      - run:
-          name: Build Docker Image
-          command: docker build -t bindugopinathan/education-space:latest .
-      - run:
-          name: Push Docker Image
-          command: docker push bindugopinathan/education-space:latest          
   deploy:
     docker:
       - image: cimg/node:16.10
@@ -55,35 +41,46 @@ jobs:
             heroku stack:set container -a bindu-su-devops
             heroku container:push web -a bindu-su-devops
             heroku container:release web -a bindu-su-devops
+  scan:
+    docker: 
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: bindugopinathan/education-test
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
+  codescan:
+    docker: 
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: bindugopinathan/education-space
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - snyk/install
+      - run: |
+          snyk code test
 
 
 
 workflows:
   simple_workflow:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - main
-                - release
+      - build
+      # - deploy:
+      #     requires:
+      #       - test
+      - scan:
+          requires:
+            - build
+      - codescan:
+          requires:
+            - build      
       - test:
           requires: 
-            - build
-          filters:
-            branches:
-              only:
-                - main
-                - release   
-      - publish:
-          requires:
-            - test
-          filters:
-            branches:
-              only: release  
-      - deploy:
-          requires:
-            - publish  
-          filters:
-            branches:
-              only: release  
+            - scan
